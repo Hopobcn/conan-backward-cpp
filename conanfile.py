@@ -48,8 +48,6 @@ class BackwardCppConan(ConanFile):
     def configure(self):
         if self.settings.os not in ["Linux", "Macos", "Android"]:
             raise ConanInvalidConfiguration("backward-cpp is not supported by your platform.")
-        if not self.settings.compiler.cppstd:
-            self.settings.compiler.cppstd = 11
         
     # Warning: Setting options conditionally is FINAL and values will not be overridable
     #          from downstream dependent packages
