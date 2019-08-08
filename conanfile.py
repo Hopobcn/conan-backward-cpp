@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from conans import ConanFile, CMake, tools
-#from conans.error import ConanInvalidConfiguration
+from conans.errors import ConanInvalidConfiguration
 import os
 
 
