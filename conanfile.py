@@ -7,7 +7,7 @@ import os
 
 class BackwardCppConan(ConanFile):
     name = "backward-cpp"
-    version = "1.3"
+    version = "1.4"
     description = "A beautiful stack trace pretty printer for C++"
     topics = ("conan", "backward-cpp", "stack-trace")
     url = "https://github.com/hopobcn/conan-backward-cpp"
@@ -30,6 +30,7 @@ class BackwardCppConan(ConanFile):
        "stack_details_backtrace_symbol": [True, False],
        "stack_details_dw": [True, False],
        "stack_details_bfd": [True, False],
+       "stack_details_dwarf": [True, False],
        "shared": [True, False]
     }
     default_options = {
@@ -38,7 +39,8 @@ class BackwardCppConan(ConanFile):
        "stack_details_auto_detect": False,
        "stack_details_backtrace_symbol": False,
        "stack_details_dw": False,
-     # "stack_details_bfd": False,
+       "stack_details_bfd": False,
+       "stack_details_dwarf": True,
        "shared": False
     }
 
@@ -54,9 +56,10 @@ class BackwardCppConan(ConanFile):
     def config_options(self):
         if self.settings.os in ["Linux", "Android"]:
             # on Linux we want to define BACKWARD_HAS_UNWIND + BACKWARD_HAS_DWARF
-            self.options.stack_details_bfd = False
+            self.options.stack_details_dwarf = True
         elif self.settings.os == "Macos":
             # on Macos we want to define BACKWARD_HAS_UNWIND + BACKWARD_HAS_BACKTRACE_SYMBOL
+            self.options.stack_details_dwarf = False
             self.options.stack_details_bfd = True
         
     def requirements(self):
@@ -64,11 +67,11 @@ class BackwardCppConan(ConanFile):
             self.requires("libdwarf/20190505@hopobcn/testing")
         
     def source(self):
-        sha256 = "4bf3fb7029ff551acda6578d9d8e13d438ebdd82a787a82b157728e3af6b5dec"
+        sha256 = "ad73be31c5cfcbffbde7d34dba18158a42043a109e7f41946f0b0abd589ed55e"
         tools.get("{0}/archive/v{1}.tar.gz".format(self.homepage, self.version, sha256=sha256))
         extracted_dir = self.name + "-" + self.version
         os.rename(extracted_dir, self._source_subfolder)
-        tools.patch(base_path=self._source_subfolder, patch_file="0001-install.patch")
+        tools.patch(base_path=self._source_subfolder, patch_file="0001-install.patch", strip=0)
 
     def _configure_cmake(self):
         cmake = CMake(self)

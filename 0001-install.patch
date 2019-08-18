@@ -1,22 +1,62 @@
---- CMakeLists.txt.old	2019-08-06 21:16:13.283627923 +0200
-+++ CMakeLists.txt	2019-08-06 21:17:35.970234419 +0200
-@@ -26,14 +26,13 @@
- include(BackwardConfig.cmake)
+diff --git a/BackwardConfig.cmake b/BackwardConfig.cmake
+index 6cff86c..bb24c46 100644
+--- a/BackwardConfig.cmake
++++ b/BackwardConfig.cmake
+@@ -111,7 +111,7 @@ if (${STACK_DETAILS_AUTO_DETECT})
+ 		set(STACK_DETAILS_BACKTRACE_SYMBOL FALSE)
+ 	elseif(LIBDWARF_FOUND)
+ 		LIST(APPEND _BACKWARD_INCLUDE_DIRS ${LIBDWARF_INCLUDE_DIRS})
+-		LIST(APPEND BACKWARD_LIBRARIES ${LIBDWARF_LIBRARIES})
++		LIST(APPEND _BACKWARD_LIBRARIES ${LIBDWARF_LIBRARIES})
  
- set(CMAKE_CXX_STANDARD_REQUIRED True)
--set(CMAKE_CXX_STANDARD 11)
+ 		set(STACK_DETAILS_DW FALSE)
+ 		set(STACK_DETAILS_BFD FALSE)
+@@ -133,7 +133,7 @@ else()
+ 	endif()
  
- ###############################################################################
- # COMPILER FLAGS
- ###############################################################################
- 
- if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_COMPILER_IS_GNUCXX)
--	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic-errors")
-+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
- 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+ 	if (STACK_DETAILS_DWARF)
+-		LIST(APPEND _BACKWARD_LIBRARIES dwarf elf)
++		LIST(APPEND _BACKWARD_LIBRARIES CONAN_PKG::libdwarf ${CMAKE_DL_LIBS})
+ 	endif()
  endif()
  
-@@ -59,6 +58,7 @@
+@@ -196,7 +196,7 @@ if (NOT TARGET Backward::Backward)
+ 	)
+ 	if(BACKWARD_HAS_EXTERNAL_LIBRARIES)
+ 		set_target_properties(Backward::Backward PROPERTIES
+-			INTERFACE_LINK_LIBRARIES "${BACKWARD_LIBRARIES}" 
++			INTERFACE_LINK_LIBRARIES "${BACKWARD_LIBRARIES}"
+ 		)
+ 	endif()
+ endif()
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 119d390..f33977e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -20,9 +20,21 @@
+ # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ # SOFTWARE.
+ 
+-cmake_minimum_required(VERSION 2.8.12)
++cmake_minimum_required(VERSION 3.0)
+ project(backward CXX)
+ 
++# Introduce variables:
++# * CMAKE_INSTALL_LIBDIR
++# * CMAKE_INSTALL_BINDIR
++# * CMAKE_INSTALL_INCLUDEDIR
++include(GNUInstallDirs)
++
++if (EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
++    include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
++    conan_basic_setup(TARGETS)
++	set(USING_CONAN TRUE)
++endif()
++
+ include(BackwardConfig.cmake)
+ 
+ # check if compiler is nvcc or nvcc_wrapper
+@@ -74,6 +86,7 @@ endif()
  add_library(backward ${libtype} backward.cpp)
  target_compile_definitions(backward PUBLIC ${BACKWARD_DEFINITIONS})
  target_include_directories(backward PUBLIC ${BACKWARD_INCLUDE_DIRS})
@@ -24,14 +64,17 @@
  
  ###############################################################################
  # TESTS
-@@ -109,4 +109,8 @@
+@@ -119,9 +132,9 @@ endif()
+ 
+ install(
+     FILES "backward.hpp"
+-    DESTINATION ${CMAKE_INSTALL_PREFIX}/include
++    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+ )
  install(
      FILES "BackwardConfig.cmake"
-     DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/backward
+-    DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/backward
 -)
-\ No hay ningún carácter de nueva línea al final del archivo
++    DESTINATION ${CMAKE_INSTALL_LIBDIR}/backward
 +)
-+install(
-+    TARGETS backward
-+    DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
-+)
+\ No newline at end of file
