@@ -61,7 +61,7 @@ class BackwardCppConan(ConanFile):
         
     def requirements(self):
         if self.settings.os == "Linux":
-            self.requires("libdwarf/20190505@bincrafters/stable")
+            self.requires("libdwarf/20190505@hopobcn/testing")
         
     def source(self):
         sha256 = "4bf3fb7029ff551acda6578d9d8e13d438ebdd82a787a82b157728e3af6b5dec"
