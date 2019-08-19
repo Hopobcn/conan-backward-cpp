@@ -89,4 +89,7 @@ class BackwardCppConan(ConanFile):
         self.copy(pattern="LICENSE", dst="licenses", src=self._source_subfolder)
 
     def package_info(self):
-        self.cpp_info.libs = tools.collect_libs(self)
+        self.cpp_info.defines.append("BACKWARD_HAS_DWARF=1")
+        if self.settings.os == "Linux":
+            self.cpp_info.libs.extend(["dl"])
+        self.cpp_info.libs.extend(tools.collect_libs(self))
