@@ -78,3 +78,16 @@ index 119d390..f33977e 100644
 +    DESTINATION ${CMAKE_INSTALL_LIBDIR}/backward
 +)
 \ No newline at end of file
+diff --git a/backward.hpp b/backward.hpp
+index c9a922f..29b4bf9 100644
+--- a/backward.hpp
++++ b/backward.hpp
+@@ -1922,7 +1922,7 @@ private:
+ 
+ 		dwarf_file_t file_handle;
+ 		file_handle.reset(open(filename_object.c_str(), O_RDONLY));
+-		if (file_handle < 0) {
++		if (file_handle == nullptr) {
+ 			return r;
+ 		}
+ 
