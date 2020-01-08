@@ -1,3 +1,6 @@
+# DEPRECATED
+New recipy in conan-center-index https://github.com/conan-io/conan-center-index/tree/master/recipes/backward-cpp
+
 ## Package Status
 
 | Bintray | Windows | Linux & macOS |
